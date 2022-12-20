@@ -27,6 +27,8 @@
         const singleBook = dataSource.books[book];
         const ratingBgc = thisBook.determineRatingBgc(book.rating);
         const ratingWidth = book.rating * 10;
+        console.log('ratingBgv: ', ratingBgc);
+        console.log('ratingWidth: ', ratingWidth);
         const generatedHTML = templates.bookTemplate(singleBook);
         const generatedDOM = utils.createDOMFromHTML(generatedHTML);
         bookWrapper.appendChild(generatedDOM);
@@ -115,4 +117,5 @@
     }
   }
   const booksApp = new BooksList();
+  console.log(booksApp);
 }
