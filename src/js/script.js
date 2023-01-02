@@ -1,6 +1,5 @@
+'use strict';
 {
-  'use strict';
-
   const templates = {
     bookTemplate: Handlebars.compile(document.querySelector('#template-book').innerHTML)
   };
@@ -9,66 +8,43 @@
   class BooksList {
 
     constructor(id){
-      const thisBook = this;
+      const thisBookList = this;
 
-      thisBook.id = id;
-      thisBook.generateBooks();
-      thisBook.initActions();
-      thisBook.filterBooks();
-      thisBook.determineRatingBgc();
+      thisBookList.id = id;
+      thisBookList.generateBooks();
+      thisBookList.initActions();
+      thisBookList.getElements();
     }
 
 
     generateBooks() {
-      const thisBook = this;
+      const thisBookList = this;
       const bookWrapper = document.querySelector('.books-list');
 
-      for (let book in dataSource.books){
-        const singleBook = dataSource.books[book];
-        const ratingBgc = thisBook.determineRatingBgc(book.rating);
-        const ratingWidth = book.rating * 10;
-        console.log('ratingBgv: ', ratingBgc);
-        console.log('ratingWidth: ', ratingWidth);
-        const generatedHTML = templates.bookTemplate(singleBook);
+      for (const book of dataSource.books){
+        book.ratingBgc = thisBookList.determineRatingBgc(book.rating);
+        book.ratingWidth = book.rating * 10;
+        const generatedHTML = templates.bookTemplate(book);
         const generatedDOM = utils.createDOMFromHTML(generatedHTML);
         bookWrapper.appendChild(generatedDOM);
       }
     }
-    filterBooks(filters){
-
-      for(let book of dataSource.books){
-        
-        const bookId = book.id;
-        const bookImage = document.querySelector('.book__image[data-id="'+ bookId +'"]');
-  
-        for(let filter of filters){
-          
-          if(book.details[filter] == false && !bookImage.classList.contains('hidden')){
-            bookImage.classList.add('hidden');
-          } else if(book.details[filter] == false && bookImage.classList.contains('hidden')) {
-            bookImage.classList.remove('hidden');
-          }
-        }
-      }
-    }
 
     getElements() {
-      //const thisBook = this;
+      const thisBookList = this;
 
-      this.bookWrapper = document.querySelector('.books-list');
-      this.booksList = document.querySelector('.books-list');
-      this.filtersWrapper = document.querySelector('.filters');
+      thisBookList.bookWrapper = document.querySelector('.books-list');
+      thisBookList.filtersWrapper = document.querySelector('.filters');
     }
 
     initActions(){
 
-      const thisBook = this;
+      const thisBookList = this;
       
       const booksList = document.querySelector('.books-list');
       const favouriteBooks = [];
-      const filters = [];
+      let filters = [];
       const filterWrapper = document.querySelector('.filters');
-  
       booksList.addEventListener('dblclick', function(event){
         event.preventDefault();
         const link = event.target;
@@ -83,13 +59,12 @@
           const index = favouriteBooks.indexOf(bookId);
           favouriteBooks.splice(index, 1);
         }
-  
       });
       
       filterWrapper.addEventListener('click', function(event){
         const checkbox = event.target;
         if(checkbox.tagName === 'INPUT' && checkbox.type === 'checkbox' && checkbox.name === 'filter'){
-          thisBook.filterBooks(filters);
+          thisBookList.filterBooks(filters);
           
           if(checkbox.checked){
             filters.push(checkbox.value);
@@ -98,10 +73,26 @@
             const index = filters.indexOf(checkbox.value);
             filters.splice(index, 1);
           }
-          thisBook.filterBooks(filters);
+          thisBookList.filterBooks(filters);
         }
       });
-      return filters;
+    }
+
+    filterBooks(filters){
+
+      for(const book of dataSource.books){
+
+        for(const filter of filters){
+
+          const bookImage = document.querySelector('.book__image[data-id="' + book.id + '"]');
+          if(book.details[filter] == true && !bookImage.classList.contains('hidden')){
+            bookImage.classList.add('hidden');
+            break;
+          } else if(book.details[filter] == false || (book.details[filter] == true && bookImage.classList.contains('hidden'))){
+            bookImage.classList.remove('hidden');
+          }
+        }
+      }
     }
     determineRatingBgc(rating){
     
@@ -116,6 +107,5 @@
       }
     }
   }
-  const booksApp = new BooksList();
-  console.log(booksApp);
+  new BooksList();
 }
