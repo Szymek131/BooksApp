@@ -43,7 +43,7 @@
       
       const booksList = document.querySelector('.books-list');
       const favouriteBooks = [];
-      let filters = [];
+      const filters = [];
       const filterWrapper = document.querySelector('.filters');
       booksList.addEventListener('dblclick', function(event){
         event.preventDefault();
@@ -81,16 +81,19 @@
     filterBooks(filters){
 
       for(const book of dataSource.books){
+        const bookImage = document.querySelector('.book__image[data-id="' + book.id + '"]');
 
+        let shouldBeHidden = false;
         for(const filter of filters){
-
-          const bookImage = document.querySelector('.book__image[data-id="' + book.id + '"]');
-          if(book.details[filter] == true && !bookImage.classList.contains('hidden')){
-            bookImage.classList.add('hidden');
-            break;
-          } else if(book.details[filter] == false || (book.details[filter] == true && bookImage.classList.contains('hidden'))){
-            bookImage.classList.remove('hidden');
+          if(!shouldBeHidden && book.details[filter]){
+            shouldBeHidden = true;
           }
+        }
+
+        if (shouldBeHidden) {
+          bookImage.classList.add('hidden');
+        } else {
+          bookImage.classList.remove('hidden');
         }
       }
     }
